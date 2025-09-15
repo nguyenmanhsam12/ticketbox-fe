@@ -15,9 +15,12 @@ import { fetchEventDetailApi, fetchEventSuggestionsApi } from '@/src/apis/events
 import { formatDate, formatPrice } from '@/src/helpers/format.helper';
 import dayjs from 'dayjs';
 import ShowDescription from '@/src/components/ShowDescription';
-import { redirect } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { EventDetail, EventItem } from '@/src/utils/interfaces/event.interface';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/src/redux/store/store';
+import { openLogin } from '@/src/redux/store/headerSlice';
 
 const ShowTime = ({ show } : any) => {
   const start = dayjs(show.time_start).format('HH:mm');
@@ -31,21 +34,21 @@ const ShowTime = ({ show } : any) => {
   );
 };
 
-export default function EventDetailPage({
-  params,
-}: {
-  params: Promise<{ EventSlugAndId: string }>;
-}) {
-  const { EventSlugAndId } = React.use(params);
+export default function EventDetailPage() {
+  const { EventSlugAndId } = useParams<{ EventSlugAndId: string }>();
   const parts = EventSlugAndId.split('-');
   const id = parts[parts.length - 1];
 
+  console.log('id',id);
+  
   const [expanded, setExpanded] = useState(false);
   const [eventDetail, setEventDetail] = useState<EventDetail | null>(null);
   const [eventSuggestions, setEventSuggestions] = useState<EventItem[] | null >(null);
   const introRef = useRef<HTMLHeadingElement>(null);
   const ticketSectionRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const user = useSelector((state : RootState) => state.auth.user);
+  const dispatch = useDispatch();
 
   const handleCollapse = () => {
     setExpanded(false);
@@ -63,6 +66,10 @@ export default function EventDetailPage({
   };
 
   const handleBuyTicket = (EventId : number , ShowId : number ) => {
+    if(!user) {
+      dispatch(openLogin());
+      return;
+    }
     router.push(`events/${EventId}/bookings/${ShowId}/select-ticket`);
   }
 

@@ -81,7 +81,6 @@ export default function SelectTicket() {
   const redirecPayment = async (eventId: number, showId: number) => {
     try {
       const payload = {
-        userId: 1,
         showId,
         eventId,
         items: Object.entries(quantities)

@@ -1,7 +1,8 @@
-import axiosInstance from "@/src/config/interceptor";
-import axios from '@/src/config/axios.config';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import axiosPublic from "../config/axiosPublic";
 
-export const getTicketsByShowApi = async (showId) => {
-    const res = await axios.get(`/events/showings/${showId}`);
+
+export const getTicketsByShowApi = async (showId: any) => {
+    const res = await axiosPublic.get(`/events/showings/${showId}`);
     return res.data;
 }

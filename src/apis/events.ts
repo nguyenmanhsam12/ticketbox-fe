@@ -1,4 +1,4 @@
-import axios from '@/src/config/axios.config';
+import axiosPublic from "../config/axiosPublic";
 import { SERVER_URL } from '../utils/const/config.const';
 import axiosInstance from "@/src/config/interceptor";
 import { createEventFormData, createUpdateEventFormData, type EventFormDataWithFiles } from "@/src/utils/formData.utils";
@@ -7,7 +7,7 @@ import { CreateEventPayload, Events } from '../utils/interfaces/event.interface'
 
 export type UpdateEventPayload = Partial<CreateEventPayload>;
 export const fetchEventsApi = async () => {
-  const response = await axios.get('/events/discovery/categories');
+  const response = await axiosPublic.get('/events/discovery/categories');
   return response.data;
 };
 
@@ -16,24 +16,25 @@ export const fetchThisWeekendOrThisMonthEventsApi = async (
   from: string,
   to: string
 ) => {
-  const response = await axios.get(
+  const response = await axiosPublic.get(
     `/events/recommended-events?at=${at}&from=${from}&to=${to}`
   );
   return response.data;
 };
 
 export const fetchEventsBannersApi = async () => {
-  const response = await axios.get('/events/discovery/banners');
+  const response = await axiosPublic.get('/events/discovery/banners');
   return response.data;
 };
 
 export const fetchEventDetailApi = async (id: string) => {
-  const response = await axios.get(`/events/detail/${id}`);
+  console.log('id-fetchEventDetailApi', id);
+  const response = await axiosPublic.get(`/events/detail/${id}`);
   return response.data;
 };
 
 export const fetchEventSuggestionsApi = async (id: string) => {
-  const response = await axios.get(`/events/event-suggestions/${id}`);
+  const response = await axiosPublic.get(`/events/event-suggestions/${id}`);
   return response.data;
 };
 

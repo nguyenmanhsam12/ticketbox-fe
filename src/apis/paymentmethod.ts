@@ -1,6 +1,6 @@
-import axios from '@/src/config/axios.config'
+import axiosPublic from "../config/axiosPublic";
 
 export const fetchPaymentMethodApi = async () => {
-    const response = await axios.get('/payment-methods');
+    const response = await axiosPublic.get('/payment-methods');
     return response.data;
 }

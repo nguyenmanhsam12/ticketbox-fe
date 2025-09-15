@@ -5,10 +5,12 @@ const api = axios;
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("accessToken");
+        console.log('token', token);
+
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-        
+
         // Kiểm tra loại dữ liệu để set Content-Type phù hợp
         const isFormData = config.data instanceof FormData;
         if (isFormData) {
@@ -18,7 +20,7 @@ api.interceptors.request.use(
             // Set JSON cho các request khác
             config.headers["Content-Type"] = "application/json";
         }
-        
+
         return config;
     },
     (error) => Promise.reject(error)
@@ -27,6 +29,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
+        // error.config là cấu hình request gốc (URL, headers, data...).
         const originalRequest = error.config;
 
         if (error.response?.status === 401 && !originalRequest._retry) {
@@ -38,7 +41,7 @@ api.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const {data} = await axios.post("/auth/refresh");
+                const { data } = await axios.post("/auth/refresh");
                 localStorage.setItem("accessToken", data.data.access_token);
                 originalRequest.headers.Authorization = `Bearer ${data.data.access_token}`;
                 return axios(originalRequest);

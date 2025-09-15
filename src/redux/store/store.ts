@@ -1,19 +1,21 @@
-import {configureStore, combineReducers} from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
-import {persistReducer, persistStore} from "redux-persist";
-import {FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER} from "redux-persist";
-import userReducer from "./userSlice";
+import { persistReducer, persistStore } from "redux-persist";
+import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 import eventReducer from "./eventSlice";
+import authReducer from "./authSlice";
+import headerReducer from "./headerSlice";
 
 const persistConfig = {
     key: "root",
     storage,
-    whitelist: ["user","event"],
+    whitelist: ["auth", "event"],
 };
 
 const rootReducer = combineReducers({
-    user: userReducer,
+    auth: authReducer,
     event: eventReducer,
+    header: headerReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

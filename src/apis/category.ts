@@ -1,7 +1,6 @@
-
-import axios from "@/src/config/axios.config";
+import axiosPublic from "../config/axiosPublic";
 
 export const fetchAllCategoryApi = async () => {
-    const response = await axios.get('/categories');
+    const response = await axiosPublic.get('/categories');
     return response.data;
 }
