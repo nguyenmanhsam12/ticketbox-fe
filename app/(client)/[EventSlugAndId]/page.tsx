@@ -38,9 +38,6 @@ export default function EventDetailPage() {
   const { EventSlugAndId } = useParams<{ EventSlugAndId: string }>();
   const parts = EventSlugAndId.split('-');
   const id = parts[parts.length - 1];
-
-  console.log('id',id);
-  
   const [expanded, setExpanded] = useState(false);
   const [eventDetail, setEventDetail] = useState<EventDetail | null>(null);
   const [eventSuggestions, setEventSuggestions] = useState<EventItem[] | null >(null);

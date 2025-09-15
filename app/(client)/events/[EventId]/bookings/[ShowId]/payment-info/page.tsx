@@ -2,6 +2,7 @@
 'use client';
 
 import { cancelCartApi } from '@/src/apis/cart';
+import { createOrderApi } from '@/src/apis/order';
 import { fetchPaymentMethodApi } from '@/src/apis/paymentmethod';
 import CancelOrderModal from '@/src/components/modal/CancelOrderModal';
 import ExpireModal from '@/src/components/modal/ExpireModal';
@@ -12,10 +13,13 @@ import {
   fetchEventByShowId,
   useFetch,
 } from '@/src/hooks/useFetch';
+import { RootState } from '@/src/redux/store/store';
 import { CalendarOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 export default function PaymentInfo() {
   const params = useParams<{ EventId: string; ShowId: string }>();
@@ -31,6 +35,8 @@ export default function PaymentInfo() {
   });
   const router = useRouter();
   const [paymentMethodData, setPaymentMethodData] = useState<any>([]);
+  const user = useSelector((state:RootState) => state.auth.user);
+  const [selectedMethod, setSelectedMethod] = useState<number | null>(null);
 
   const handleExpireOk = async () => {
     await cancelCartApi(cartData?.booking_code);
@@ -80,6 +86,22 @@ export default function PaymentInfo() {
     }
     fetchPaymentMethod();
   }, []);
+
+  const handlePayment = async () => {    
+    if(!selectedMethod) {
+      toast.error('Vui lòng chọn phương thức thanh toán!');
+      return;
+    }
+    try {
+      const res = await createOrderApi({ bookingCode : cartData?.booking_code, showId : ShowId, paymentMethodId : selectedMethod });
+      if(res?.success) {
+        window.location.href = res?.data;
+      }
+    } catch (error) {
+      console.log('Có lỗi ở handlePayment',error);
+      
+    }
+  }
 
   return (
     <main>
@@ -165,7 +187,7 @@ export default function PaymentInfo() {
                       <div className="text-[rgb(255,255,255)] text-sm mt-2">
                         Vé điện tử sẽ được hiển thị trong mục {'Vé của tôi'} của
                         tài khoản <br />
-                        bosamday1@gmail.com
+                        { user.email }
                       </div>
                     </div>
                   </div>
@@ -200,8 +222,10 @@ export default function PaymentInfo() {
                           <input
                             type="radio"
                             name="payment"
-                            className="w-4 h-4 accent-[#4ade80]"
-                            defaultChecked
+                            value={item.id}
+                            className="w-4 h-4 accent-[rgb(74,222,128)]"
+                            checked={selectedMethod === item.id}
+                            onChange={() => setSelectedMethod(item.id)}
                           />
                           <img
                             src={item?.logoUrl}
@@ -297,7 +321,9 @@ export default function PaymentInfo() {
                       Điều Kiện Giao Dịch Chung
                     </span>
                   </div>
-                  <button className="w-full bg-[#4ade80] text-white py-2 px-2 hover:bg-primaryHover rounded-lg font-medium">
+                  <button className="w-full bg-[#4ade80] text-white py-2 px-2 hover:bg-primaryHover rounded-lg font-medium"
+                    onClick={handlePayment}
+                  >
                     Thanh toán
                   </button>
                 </div>

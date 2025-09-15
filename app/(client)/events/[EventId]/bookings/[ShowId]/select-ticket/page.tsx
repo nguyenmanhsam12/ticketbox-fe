@@ -192,7 +192,6 @@ export default function SelectTicket() {
                 (ci) => ci.ticket.id === ticket.id
               );
 
-              console.log('matched', matched);
               return matched
                 ? { ...ticket, remaining_ticket: matched.ticket.remaining_ticket }
                 : ticket;
