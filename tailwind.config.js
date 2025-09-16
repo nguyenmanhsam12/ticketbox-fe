@@ -13,6 +13,9 @@ const config = {
         primaryHover: '#28a864',
         secondary : '#27272a',
       },
+      screens: {
+        'xl': '1440px', // đặt tên tuỳ ý
+      },
     },
   plugins: [aspectRatio, lineClamp, typography], }
 };

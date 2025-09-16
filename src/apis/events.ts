@@ -28,7 +28,6 @@ export const fetchEventsBannersApi = async () => {
 };
 
 export const fetchEventDetailApi = async (id: string) => {
-  console.log('id-fetchEventDetailApi', id);
   const response = await axiosPublic.get(`/events/detail/${id}`);
   return response.data;
 };

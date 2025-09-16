@@ -178,8 +178,6 @@ export default function SelectTicket() {
       showId: number;
       tickets: any[];
     }) => {
-      console.log('payload', payload);
-
       if (
         +payload.eventId === Number(params.EventId) &&
         +payload.showId === Number(params.ShowId)
