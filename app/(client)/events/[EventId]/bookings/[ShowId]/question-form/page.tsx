@@ -24,13 +24,13 @@ export default function QuestionForm() {
   const params = useParams<{ EventId: string; ShowId: string }>();
   const ShowId = params?.ShowId;
   const EventId = params?.EventId;
+  const router = useRouter();
   const [bookingCode] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem(`booking_code_${ShowId}`);
     }
     return null;
   });
-  const router = useRouter();
   const {
     data: showData,
     error,
@@ -49,7 +49,7 @@ export default function QuestionForm() {
 
   const handleCancel = async () => {
     await cancelCartApi(cartData?.booking_code);
-    localStorage.removeItem('booking_code');
+    localStorage.removeItem(`booking_code_${ShowId}`);
     setIsModalOpen(false);
     router.push(`/events/${EventId}/bookings/${ShowId}/select-ticket`);
   };
@@ -71,6 +71,7 @@ export default function QuestionForm() {
     {},
     `/events/${EventId}/bookings/${ShowId}/select-ticket`
   );
+  
   const { minutes, seconds, isExpired } = useCountDown(
     cartData?.expired_at,
     () => {

@@ -51,19 +51,34 @@ export default function SelectTicket() {
   const [showPopup, setShowPopup] = useState(false);
   const { socket, isConnected } = useSocket();
 
-  const increase = (id: string) => {
+  const getTicketById = (id: number) => {
+    return data?.tickets?.find((t) => Number(t.id) === id);
+  };
+
+  
+
+  const increase = (id : number) => {
+    const ticket = getTicketById(id);
+    if (!ticket) return;
+    const max = ticket?.max_ticket ?? 10;
     setQuantities((prev) => {
       const current = prev[id] || 0;
-      if (current >= 10) return prev; // Không tăng nữa
+      if (current >= max) return prev; // Đã đạt tối đa
       return { ...prev, [id]: current + 1 };
     });
   };
 
   const decrease = (id: string) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [id]: prev[id] > 0 ? prev[id] - 1 : 0,
-    }));
+    const ticket = getTicketById(id);
+    if (!ticket) return;
+
+    const min = ticket.min_ticket ?? 1;
+
+    setQuantities((prev) => {
+      const current = prev[id] || 0;
+      if (current < min) return prev; // Không giảm dưới min
+      return { ...prev, [id]: current - 1 };
+    });
   };
 
   useEffect(() => {
@@ -128,11 +143,11 @@ export default function SelectTicket() {
           setCart(cartData);
           setShowPopup(true); // mở popup
         } else {
-          localStorage.removeItem('booking_code');
+          localStorage.removeItem(`booking_code_${ShowId}`);
         }
       } catch (err) {
         console.error('Không lấy được giỏ hàng', err);
-        localStorage.removeItem('booking_code');
+        localStorage.removeItem(`booking_code_${ShowId}`);
       }
     }
 
@@ -155,7 +170,7 @@ export default function SelectTicket() {
     } catch (err) {
       console.error('Lỗi khi hủy giỏ hàng', err);
     } finally {
-      localStorage.removeItem('booking_code');
+      localStorage.removeItem(`booking_code_${ShowId}`);
       setShowPopup(false);
       setCart(null);
     }
@@ -164,7 +179,7 @@ export default function SelectTicket() {
   const { minutes, seconds, isExpired } = useCountDown(
     cart?.expired_at || null,
     () => {
-      localStorage.removeItem('booking_code');
+      localStorage.removeItem(`booking_code_${ShowId}`);
       setCart(null);
       setShowPopup(false);
     }
@@ -191,7 +206,10 @@ export default function SelectTicket() {
               );
 
               return matched
-                ? { ...ticket, remaining_ticket: matched.ticket.remaining_ticket }
+                ? {
+                    ...ticket,
+                    remaining_ticket: matched.ticket.remaining_ticket,
+                  }
                 : ticket;
             }),
           };
@@ -296,7 +314,7 @@ export default function SelectTicket() {
                                     className={`h-8 w-8 flex items-center justify-center rounded 
                                       bg-white text-black text-sm font-bold hover:bg-gray-100 transition
                                       ${
-                                        quantities[ticket.id] >= 10
+                                        quantities[ticket.id] === ticket?.max_ticket
                                           ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                                           : 'bg-white text-black hover:bg-gray-100'
                                       } 
@@ -315,42 +333,8 @@ export default function SelectTicket() {
                                 </article>
 
                                 <ul className="list-disc list-inside text-xs leading-relaxed space-y-1">
-                                  <li>
-                                    Tham Quan và tìm hiểu cách hoạt động của
-                                    Kính Thiên Văn Lớn
-                                  </li>
-                                  <li>
-                                    Xem mô phỏng bầu trời trong Nhà Chiếu Hình
-                                    Vũ Trụ
-                                  </li>
+                                  <li>{ticket?.description}</li>
                                 </ul>
-
-                                <p className="mt-3 text-xs leading-relaxed">
-                                  <span className="font-bold text-red-400 ">
-                                    Chú ý:
-                                  </span>{' '}
-                                  NẾU THỜI TIẾT THUẬN LỢI ĐÀI SẼ MỞ THÊM HOẠT
-                                  ĐỘNG QUAN SÁT BẦU TRỜI BẰNG KÍNH THIÊN VĂN
-                                  NGHIỆP DƯ (4–6 KÍNH) VỚI GIÁ LÀ 50,000 VND.
-                                  <br />
-                                  KHÔNG NHẬN KHÁCH SAU 18:35
-                                </p>
-
-                                <div className="mt-4 border-t border-gray-600 pt-3">
-                                  <p className=" font-bold text-xs">NOTICE:</p>
-                                  <p className="text-xs leading-relaxed">
-                                    IF THE WEATHER IS FAVORABLE, THE OBSERVATORY
-                                    WILL ORGANIZE ADDITIONAL SKY OBSERVATION
-                                    ACTIVITIES WITH 4–6 AMATEUR TELESCOPES, AT A
-                                    FEE OF 50,000 VND.
-                                    <br />
-                                    This price applies to Vietnamese visitors.
-                                    <br />
-                                    Foreign visitors are required to pay an
-                                    additional 31,000 VND per person when
-                                    visiting Nha Trang Observatory.
-                                  </p>
-                                </div>
                               </div>
                             </div>
 

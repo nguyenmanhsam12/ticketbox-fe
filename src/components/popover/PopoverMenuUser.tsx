@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import {UserOutlined, CalendarOutlined, LogoutOutlined} from '@ant-design/icons';
-import {logoutUser} from "@/src/apis/auth";
 import {toast} from "react-toastify";
 import {setUser} from "@/src/redux/store/userSlice";
 import {useRouter} from "next/navigation";
 import {useDispatch} from "react-redux";
+import { logout } from '@/src/redux/store/authSlice';
 
 const PopoverMenuUser = () => {
     const router = useRouter();
@@ -20,7 +20,7 @@ const PopoverMenuUser = () => {
     const handleLogout = async (e: React.MouseEvent) => {
         try {
             e.preventDefault();
-            await logoutUser();
+            await logout();
             toast.success('Logout successful');
             localStorage.removeItem('accessToken');
             dispatch(setUser({

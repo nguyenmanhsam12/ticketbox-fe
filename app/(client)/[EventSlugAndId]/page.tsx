@@ -145,16 +145,17 @@ export default function EventDetailPage() {
               {/* Giá + Button */}
               <div className="mt-6 border-t border-gray-300 pt-0.5">
                 <p className="text-base">
-                  Giá từ{' '}
                   <span className="text-primary font-semibold">
-                    {formatPrice(eventDetail?.minTicketPrice ?? 0)}{' '}
+                    { eventDetail?.isFree ? 'Miễn Phí' : `Giá từ ${formatPrice(eventDetail?.minTicketPrice)}` }
                     <RightOutlined className="text-[12px]" />
                   </span>
                 </p>
                 <button className="mt-3 w-full bg-primary text-white text-sm font-semibold py-1 rounded-md hover:bg-white hover:text-black transition">
                   { eventDetail && eventDetail?.shows?.length > 1 ? <div
                     onClick={ () => handleScrollToTickets() }
-                  >Chọn lịch diễn</div> : <div onClick={ () => handleBuyTicket(eventDetail?.id as number ,eventDetail?.shows[0]?.id as number ) } >Mua vé ngay</div> }
+                  >Chọn lịch diễn</div> : <div onClick={ () => handleBuyTicket(eventDetail?.id as number ,eventDetail?.shows[0]?.id as number ) } >
+                    { eventDetail?.isFree ? 'Đăng ký ngay' : 'Mua vé ngay' }
+                  </div> }
                 </button>
               </div>
             </div>
@@ -252,7 +253,7 @@ export default function EventDetailPage() {
                           className="bg-primary hover:bg-primaryHover"
                           onClick={() => handleBuyTicket( Number(id) ,show.id as number)}
                         >
-                          Mua vé ngay
+                          { eventDetail?.isFree ? 'Đăng ký ngay' : 'Mua vé ngay' }
                         </Button>
                       </div>
                     ),

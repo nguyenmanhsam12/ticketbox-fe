@@ -1,50 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { getOrderApi } from '@/src/apis/order';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import image1 from '@/src/image/image.svg';
 import image2 from '@/src/image/image1.svg';
 import Image from 'next/image';
-
-import { Table } from 'antd';
-import type { TableProps } from 'antd';
-
-interface DataType {
-  key: string;
-  name: string;
-  orderCode: string;
-  total_amount: string;
-}
-
-const columns: TableProps<DataType>['columns'] = [
-  {
-    title: 'Sự kiện',
-    dataIndex: 'name',
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: 'Mã đơn hàng',
-    className: 'column-money',
-    dataIndex: 'orderCode',
-    align: 'right',
-  },
-  {
-    title: 'Tổng tiền',
-    dataIndex: 'total_amount',
-  },
-];
-
-const data: DataType[] = [
-  {
-    key: '1',
-    name: 'DOANH NGHIỆP BỨT PHÁ 2025 - ĐỔI MỚI - THÍCH ỨNG - TĂNG TRƯỞNG',
-    orderCode: '615996996',
-    total_amount: '0 đ',
-  }
-];
-
-
+import { formatPrice } from '@/src/helpers/format.helper';
 
 export default function PaymentResultPage() {
   const { EventId, ShowId, orderCode } = useParams<{
@@ -53,14 +16,14 @@ export default function PaymentResultPage() {
     orderCode: string;
   }>();
   const orderCodeId = orderCode.substring(orderCode.indexOf('ORD-'));
-  const [orderData, setOrderData] = useState([]);
+  const [orderData, setOrderData] = useState<any | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     async function getOrder() {
       const res = await getOrderApi(orderCodeId);
       console.log('res',res);
-      
-    //   const { orderCode,  } = res.data;
+      setOrderData(res.data);
     }
 
     getOrder();
@@ -109,23 +72,42 @@ export default function PaymentResultPage() {
                                                 <h1 className='text-primary text-[20px] font-bold'>Đặt vé thành công</h1>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col border-transparent rounded-xl p-3 bg-[rgb(255,255,255)] lg:w-full">
-                                            <div className="box-border m-0 p-0 text-[rgb(0,0,0)] text-sm list-none">
-                                                {/* table */}
-                                                <Table<DataType>
-                                                    columns={columns}
-                                                    dataSource={data}
-                                                />
+                                        <div className="flex flex-col border-transparent rounded-xl p-6 bg-[rgb(255,255,255)] lg:w-full shadow-sm">
+                                            <div className="space-y-4">
+                                                <h2 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                                                    Thông tin đơn hàng
+                                                </h2>
+                                                
+                                                {/* Thông tin sự kiện */}
+                                                <div className="space-y-3">
+                                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                                                        <span className="text-gray-600 font-medium min-w-[120px]">Sự kiện:</span>
+                                                        <span className="text-gray-900 font-medium text-right sm:flex-1">{orderData?.event?.name}</span>
+                                                    </div>
+                                                    
+                                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                                                        <span className="text-gray-600 font-medium">Mã đơn hàng:</span>
+                                                        <span className="text-gray-900 font-bold text-lg">{orderData?.orderCode}</span>
+                                                    </div>
+                                                    
+                                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pt-2 border-t border-gray-100">
+                                                        <span className="text-gray-600 font-medium">Tổng tiền:</span>
+                                                        <span className="text-[rgb(45,194,117)] font-bold text-xl">{formatPrice(orderData?.total_amount)}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         {/* action */}
                                         <div className="flex gap-2 w-full">
                                             <button className='flex items-center justify-center w-full outline-none cursor-pointer h-[40px]
                                             leading-6 min-w-[88px] px-6 pt-0 bg-transparent text-[rgb(45,194,117)] border border-[rgb(45,194,117)]
-                                            font-medium text-base rounded-[4px]'>Trang chủ</button>
+                                            font-medium text-base rounded-[4px]'
+                                            onClick={() => router.push('/')}>Trang chủ</button>
                                             <button className='flex items-center justify-center border-none w-full outline-none
                                             cursor-pointer leading-6 min-w-[88px] px-6 pt-0 font-medium text-base text-[rgb(255,255,255)] bg-[rgb(45,194,117)]
-                                            '>Vé của tôi</button>
+                                            '
+                                            onClick={() => router.push('/')}
+                                            >Vé của tôi</button>
                                         </div>
                                     </div>
                                 </div>

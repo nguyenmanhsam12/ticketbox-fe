@@ -33,7 +33,7 @@ export default function Header() {
   const { showLogin, showRegister } = useSelector((state : RootState) => state.header);
   const dispatch = useDispatch();
 
-  const hiddenPaths = ['/search', '/events'];
+  const hiddenPaths = ['/search', '/events', '/my-tickets'];
 
   const hideBottomNav = hiddenPaths.some((path) => pathname.startsWith(path));
   const hideTopNav = pathname === '/events';
@@ -85,7 +85,7 @@ export default function Header() {
 
                { user && 
                 <Link
-                  href="/my-wallet"
+                  href="/my-tickets"
                   className="flex items-center space-x-2 p-2 rounded-md hover:bg-green-700 transition-colors duration-200"
                 >
                   <WalletOutlined className="text-sm" />
