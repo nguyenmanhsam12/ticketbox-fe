@@ -33,7 +33,7 @@ export default function Header() {
   const { showLogin, showRegister } = useSelector((state : RootState) => state.header);
   const dispatch = useDispatch();
 
-  const hiddenPaths = ['/search', '/events', '/my-tickets'];
+  const hiddenPaths = ['/search', '/events', '/my-tickets', '/my-account'];
 
   const hideBottomNav = hiddenPaths.some((path) => pathname.startsWith(path));
   const hideTopNav = pathname === '/events';

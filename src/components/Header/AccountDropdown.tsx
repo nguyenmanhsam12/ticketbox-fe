@@ -52,7 +52,7 @@ export default function AccountDropdown(props : any) {
       {open && (
         <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-1 z-50 text-gray-800">
           <Link
-            href="/my-wallet"
+            href="/my-tickets"
             className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100"
           >
             <WalletOutlined className="text-lg" />
@@ -66,7 +66,7 @@ export default function AccountDropdown(props : any) {
             <span>Sự kiện của tôi</span>
           </Link>
           <Link
-            href="/my-account"
+            href="/my-account/my-profile"
             className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100"
           >
             <UserOutlined className="text-lg" />

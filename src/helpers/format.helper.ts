@@ -1,3 +1,5 @@
+
+import moment from 'moment';
 // format.helper.ts
 
 // format không có giờ
@@ -37,4 +39,21 @@ export function isEventPast(day: string | Date): boolean {
   const eventDate = new Date(day);
   const now = new Date();
   return eventDate < now;
+}
+
+
+
+// Lấy ngày
+export function getDay(isoDate: string): number {
+  return moment(isoDate).date(); // 1–31
+}
+
+// Lấy tháng
+export function getMonth(isoDate: string): number {
+  return moment(isoDate).month() + 1; // 1–12 (moment bắt đầu từ 0)
+}
+
+// Lấy năm
+export function getYear(isoDate: string): number {
+  return moment(isoDate).year();
 }
