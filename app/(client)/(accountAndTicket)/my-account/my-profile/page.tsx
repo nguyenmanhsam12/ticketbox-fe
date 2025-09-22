@@ -1,14 +1,51 @@
 'use client';
+import { updateProfile } from '@/src/apis/user';
+import { update } from '@/src/redux/store/authSlice';
 import { RootState } from '@/src/redux/store/store';
-import {
-  CameraOutlined,
-  CheckOutlined,
-} from '@ant-design/icons';
+import { CameraOutlined, CheckOutlined } from '@ant-design/icons';
 import { Button, Divider } from 'antd';
-import { useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 export default function MyProfilePage() {
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
 
-  const user = useSelector((state : RootState) => state.auth.user);
+  const [formData, setFormData] = useState({
+    username: user?.username || '',
+    phone: user?.phone || '',
+    email: user?.email || '',
+    date_of_birth: user?.date_of_birth || '',
+    gender: user?.gender || '',
+    avatar: null as File | null,
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      setFormData((prev) => ({ ...prev, avatar: files ? files[0] : null }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async () => {
+    const payload = new FormData();
+    payload.append('username', formData.username);
+    payload.append('phone', formData.phone);
+    payload.append('date_of_birth', formData.date_of_birth);
+    payload.append('gender', formData.gender);
+    if (formData.avatar) payload.append('avatar', formData.avatar);
+    
+    try {
+      const user = await updateProfile(payload);
+      dispatch(update(user))
+      toast.success('Cập nhập thông tin thành công!')
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi cập nhật');
+      console.log('lỗi ở updateProfile', error);
+    }
+  };
 
   return (
     <>
@@ -17,12 +54,19 @@ export default function MyProfilePage() {
         <div className="text-left text-2xl font-bold leading-6 pb-[1rem] bg-transparent text-white">
           Thông tin tài khoản
         </div>
-        <Divider style={{ borderColor: '#ffffff80' }} className='mt-0'></Divider>
+        <Divider
+          style={{ borderColor: '#ffffff80' }}
+          className="mt-0"
+        ></Divider>
         <div className="relative pt-0 overflow-auto">
           <div className="relative max-w-[360px] m-auto text-white box-border rounded-lg p-4">
             <div className="relative w-[128px] h-[128px] m-auto mb-4 cursor-pointer">
               <img
-                src="https://static.ticketbox.vn/avatar.png"
+                src={
+                  formData.avatar
+                    ? URL.createObjectURL(formData.avatar)
+                    : 'https://static.ticketbox.vn/avatar.png'
+                }
                 alt="image1"
                 className="rounded-full w-full h-full object-cover"
               />
@@ -34,6 +78,7 @@ export default function MyProfilePage() {
                 accept="image/*"
                 id="avatar-upload"
                 className="hidden"
+                onChange={handleChange}
               />
             </div>
             <div className="leading-[21px] mb-4 break-words">
@@ -50,10 +95,12 @@ export default function MyProfilePage() {
               <div className="relative">
                 <input
                   type="text"
-                  name="name"
+                  name="username"
                   placeholder="Nhập ở đây"
                   className="border border-transparent text-black cursor-text bg-[rgb(245,247,252)]
                   w-full h-[44px] p-3 outline-none font-normal text-sm leading-5 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
+                  value={formData.username}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -65,10 +112,12 @@ export default function MyProfilePage() {
               <div className="relative">
                 <input
                   type="text"
-                  name="name"
+                  name="phone"
                   placeholder="Nhập ở đây"
                   className="border border-transparent text-black cursor-text bg-[rgb(245,247,252)]
                   w-full h-[44px] p-3 outline-none font-normal text-sm leading-5 rounded-md focus:border-primary focus:ring-1 focus:ring-primary"
+                  value={formData.phone}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -80,8 +129,8 @@ export default function MyProfilePage() {
               <div className="relative">
                 <input
                   type="text"
-                  name="name"
-                  value={user.email}
+                  name="email"
+                  value={user?.email}
                   className="border border-transparent bg-[rgb(245,247,252)]
                   w-full h-[44px] p-3 outline-none font-normal text-sm leading-5 rounded-md text-[rgb(175,184,204)] cursor-not-allowed"
                   disabled
@@ -98,11 +147,13 @@ export default function MyProfilePage() {
               <div className="relative">
                 <input
                   type="date"
-                  name="dob"
+                  name="date_of_birth"
                   placeholder="Chọn ngày sinh"
+                  value={formData.date_of_birth}
                   className="border border-transparent text-black cursor-pointer bg-[rgb(245,247,252)]
                  w-full h-[44px] p-3 outline-none font-normal text-sm leading-5 rounded-md
                  focus:border-primary focus:ring-1 focus:ring-primary"
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -113,44 +164,36 @@ export default function MyProfilePage() {
                 Giới tính
               </div>
               <div className="flex gap-6 items-center text-white">
-                {/* Nam */}
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="male"
-                    className="w-4 h-4 text-primary focus:ring-primary cursor-pointer accent-primary"
-                  />
-                  <span className="text-sm">Nam</span>
-                </label>
-
-                {/* Nữ */}
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="female"
-                    className="w-4 h-4 text-primary focus:ring-primary cursor-pointer accent-primary"
-                  />
-                  <span className="text-sm">Nữ</span>
-                </label>
-
-                {/* Khác */}
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="other"
-                    className="w-4 h-4 text-primary focus:ring-primary cursor-pointer accent-primary"
-                  />
-                  <span className="text-sm">Khác</span>
-                </label>
+                {['male', 'female', 'other'].map((g) => (
+                  <label
+                    key={g}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="gender"
+                      value={g}
+                      checked={formData.gender === g}
+                      onChange={handleChange}
+                      className="w-4 h-4 accent-primary"
+                    />
+                    <span>
+                      {g === 'male' ? 'Nam' : g === 'female' ? 'Nữ' : 'Khác'}
+                    </span>
+                  </label>
+                ))}
               </div>
             </div>
 
             {/* button */}
             <div className="">
-              <Button type="primary" className='w-full bg-primary'>Hoàn thành</Button>
+              <Button
+                type="primary"
+                className="w-full bg-primary"
+                onClick={handleSubmit}
+              >
+                Hoàn thành
+              </Button>
             </div>
           </div>
         </div>
